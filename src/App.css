@@ -220,3 +220,61 @@ body {
   border-style: solid;
   border-color: white transparent transparent transparent;
 }
+
+/* ===================== */
+/* MOBILE RESPONSIVE     */
+/* ===================== */
+@media (max-width: 600px) {
+  body {
+    overflow: auto;
+  }
+
+  .app {
+    align-items: flex-start;
+    padding: 20px 0;
+    min-height: 100vh;
+    height: auto;
+  }
+
+  .main-card {
+    width: 92%;
+    height: auto;
+    min-height: 80vh;
+    border-radius: 16px;
+  }
+
+  .nav-pill {
+    margin: 16px auto;
+    width: 90%;
+    justify-content: center;
+  }
+
+  .nav-pill button {
+    padding: 8px 14px;
+    font-size: 12px;
+  }
+
+  .card-content {
+    padding: 10px 20px 24px;
+  }
+
+  .hero h1 {
+    font-size: 28px;
+  }
+
+  .hero p {
+    font-size: 14px;
+  }
+
+  .project-item h3 {
+    font-size: 15px;
+  }
+
+  .project-item p {
+    font-size: 13px;
+  }
+
+  .sticker {
+    display: none; /* Hide stickers on mobile to avoid layout issues */
+  }
+}

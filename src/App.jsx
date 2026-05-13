@@ -2,7 +2,6 @@ import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaGithub, FaTwitter, FaLinkedin, FaEnvelope } from "react-icons/fa";
 import "./App.css";
-import yarnPng from "./assets/yarn.png";
 import ribbonPng from "./assets/ribbon.png";
 import shinniePng from "./assets/shinnie.png";
 import coffeePng from "./assets/coffee.png";
@@ -81,16 +80,6 @@ export default function App() {
     {
       id: 1,
       type: "image",
-      content: yarnPng,
-      top: "20%",
-      left: "80%",
-      rotate: 10,
-      size: 40,
-      message: "Knitting time!",
-    },
-    {
-      id: 2,
-      type: "image",
       content: ribbonPng,
       top: "35%",
       left: "80%",
@@ -99,7 +88,7 @@ export default function App() {
       message: "So cute~",
     },
     {
-      id: 3,
+      id: 2,
       type: "image",
       content: shinniePng,
       top: "50%",
@@ -109,7 +98,7 @@ export default function App() {
       message: "Hello",
     },
     {
-      id: 4,
+      id: 3,
       type: "image",
       content: coffeePng,
       top: "65%",
@@ -121,7 +110,7 @@ export default function App() {
 
     // 🌸 FLOWER STICKER WITH INSTAGRAM CARD
     {
-      id: 5,
+      id: 4,
       type: "image",
       content: flowerPng,
       top: "80%",
@@ -186,7 +175,7 @@ export default function App() {
     },
 
     {
-      id: 6,
+      id: 5,
       type: "image",
       content: luzzPng,
       top: "50%",
@@ -246,10 +235,11 @@ export default function App() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.3 }}
             >
-              <h1>Shinnie's Channel</h1>
-              <p>
-                yoooo guys. Let me 炫耀一下 website I built hehe.
-              </p>
+              <h1>About Me</h1>
+              <div style={{ textAlign: "left" }}>
+                <p>Hi, I'm Shinnie, a Diploma in Computer Science student at TARUMT.</p>
+                <p>Seeking an opportunity to gain practical experience.</p>
+              </div>
             </motion.div>
           )}
 
