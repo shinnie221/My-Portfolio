@@ -1,0 +1,10 @@
+/* Cleaned out to let App.css handle styles for the digital scrapbook */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}
