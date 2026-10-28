@@ -1,283 +1,185 @@
-import { useState, useRef, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { FaGithub, FaTwitter, FaLinkedin, FaEnvelope } from "react-icons/fa";
+import { useState, useEffect, useCallback } from "react";
+import {
+  motion,
+  AnimatePresence,
+  useScroll,
+  useMotionValueEvent,
+  useReducedMotion,
+} from "framer-motion";
+import { Tag, ChevronLeft, ChevronRight } from "lucide-react";
 import "./App.css";
-import ribbonPng from "./assets/ribbon.png";
-import shinniePng from "./assets/shinnie.png";
-import coffeePng from "./assets/coffee.png";
-import flowerPng from "./assets/flower.png";
-import luzzPng from "./assets/luzz.png";
+import { ITEMS } from "./data";
+import { Cloud, Wave, Zigzag } from "./components/Doodles";
+import DeskScene from "./components/DeskScene";
+import ItemPanel from "./components/ItemPanel";
+import MenuTag from "./components/MenuTag";
 
-const Sticker = ({ sticker, constraintsRef }) => {
-  const [showWords, setShowWords] = useState(false);
-
+function Intro({ onDone }) {
   useEffect(() => {
-    let timer;
-    if (showWords) {
-      timer = setTimeout(() => {
-        setShowWords(false);
-      }, 2000);
-    }
-    return () => clearTimeout(timer);
-  }, [showWords]);
+    const t = setTimeout(onDone, 1700);
+    return () => clearTimeout(t);
+  }, [onDone]);
 
   return (
     <motion.div
-      className="sticker"
-      style={{ top: sticker.top, left: sticker.left }}
-      drag
-      dragConstraints={constraintsRef}
-      dragMomentum={true}
-      whileHover={{ scale: 1.1, rotate: 0 }}
-      whileTap={{ scale: 0.95 }}
-      initial={{ rotate: sticker.rotate }}
-      onTap={() => setShowWords((prev) => !prev)}
+      className="intro"
+      onClick={onDone}
+      exit={{ y: "-115%" }}
+      transition={{ duration: 1.1, ease: [0.7, 0, 0.2, 1] }}
     >
-      <AnimatePresence>
-        {showWords && sticker.message && (
-          <motion.div
-            className="sticker-message"
-            initial={{ opacity: 0, y: 10, scale: 0.8 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 10, scale: 0.8 }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            {typeof sticker.message === "function"
-              ? sticker.message()
-              : sticker.message}
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {sticker.type === "image" ? (
-        <img
-          src={sticker.content}
-          className="sticker-img"
-          draggable={false}
-          alt="sticker"
-          style={{ width: sticker.size }}
-        />
-      ) : (
-        <div
-          className="sticker-emoji"
-          style={{
-            fontSize: sticker.size,
-            padding: sticker.size ? sticker.size / 3 : undefined,
-          }}
-        >
-          {sticker.content}
-        </div>
-      )}
+      <motion.p
+        className="intro-word"
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.2 }}
+      >
+        (hello)
+      </motion.p>
+      <Wave className="intro-wave" />
     </motion.div>
   );
+}
+
+const reveal = {
+  initial: { opacity: 0, filter: "blur(8px)", y: 12 },
+  whileInView: { opacity: 1, filter: "blur(0px)", y: 0 },
+  viewport: { once: true, amount: 0.8 },
+  transition: { duration: 0.9 },
 };
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState("about");
-  const constraintsRef = useRef(null);
+  const reduceMotion = useReducedMotion();
+  const [introDone, setIntroDone] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [openIndex, setOpenIndex] = useState(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [hovered, setHovered] = useState(null);
 
-  const stickers = [
-    {
-      id: 1,
-      type: "image",
-      content: ribbonPng,
-      top: "35%",
-      left: "80%",
-      rotate: -10,
-      size: 40,
-      message: "So cute~",
-    },
-    {
-      id: 2,
-      type: "image",
-      content: shinniePng,
-      top: "50%",
-      left: "75%",
-      rotate: 0,
-      size: 300,
-      message: "Hello",
-    },
-    {
-      id: 3,
-      type: "image",
-      content: coffeePng,
-      top: "65%",
-      left: "80%",
-      rotate: -15,
-      size: 120,
-      message: "Coffee fueled ☕",
-    },
+  const { scrollY } = useScroll();
+  useMotionValueEvent(scrollY, "change", (y) => {
+    setScrolled(y > window.innerHeight * 0.55);
+  });
 
-    // 🌸 FLOWER STICKER WITH INSTAGRAM CARD
-    {
-      id: 4,
-      type: "image",
-      content: flowerPng,
-      top: "80%",
-      left: "70%",
-      rotate: 5,
-      size: 120,
-      message: () => (
-        <div style={{ width: "210px" }}>
-          <p style={{ margin: "0 0 10px 0", fontWeight: "600", fontSize: "14px" }}>
-            🌸 Flower made by crochet
-          </p>
+  const finishIntro = useCallback(() => setIntroDone(true), []);
+  const showIntro = !introDone && !reduceMotion;
 
-          <div
-            style={{
-              border: "1px solid rgba(255,255,255,0.25)",
-              borderRadius: "14px",
-              padding: "12px",
-              background: "linear-gradient(135deg, rgba(193,53,132,0.25), rgba(131,58,180,0.25))",
-              backdropFilter: "blur(6px)",
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-              <div style={{
-                width: "32px", height: "32px", borderRadius: "50%",
-                background: "linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                fontSize: "16px"
-              }}>📷</div>
-              <div>
-                <p style={{ margin: 0, fontWeight: "bold", fontSize: "13px" }}>eighthday_knitch</p>
-                <p style={{ margin: 0, fontSize: "11px", color: "#ccc" }}>Instagram</p>
-              </div>
-            </div>
+  useEffect(() => {
+    document.body.style.overflow = showIntro ? "hidden" : "";
+  }, [showIntro]);
 
-            <p style={{ margin: "0 0 8px 0", fontSize: "12px", color: "#ddd" }}>
-              Handmade crochet pieces 🧶✨
-            </p>
-
-            <a
-              href="https://www.instagram.com/eighthday_knitch?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={(e) => e.stopPropagation()}
-              style={{
-                display: "block",
-                textAlign: "center",
-                padding: "6px 12px",
-                borderRadius: "8px",
-                background: "linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)",
-                color: "#fff",
-                fontSize: "12px",
-                fontWeight: "bold",
-                textDecoration: "none",
-                cursor: "pointer",
-              }}
-            >
-              View on Instagram →
-            </a>
-          </div>
-        </div>
+  const openById = (id) => {
+    setMenuOpen(false);
+    setOpenIndex(ITEMS.findIndex((it) => it.id === id));
+  };
+  const close = useCallback(() => setOpenIndex(null), []);
+  const step = useCallback(
+    (dir) =>
+      setOpenIndex((i) =>
+        i === null ? (dir > 0 ? 0 : ITEMS.length - 1) : (i + dir + ITEMS.length) % ITEMS.length
       ),
-    },
-
-    {
-      id: 5,
-      type: "image",
-      content: luzzPng,
-      top: "50%",
-      left: "50%",
-      rotate: 0,
-      size: 180,
-      message: "Play Pickleball with me?",
-    },
-  ];
+    []
+  );
 
   return (
-    <div className="app" ref={constraintsRef}>
-      {/* STICKERS */}
-      {stickers.map((sticker) => (
-        <Sticker
-          key={sticker.id}
-          sticker={sticker}
-          constraintsRef={constraintsRef}
-        />
-      ))}
+    <>
+      <AnimatePresence>{showIntro && <Intro onDone={finishIntro} />}</AnimatePresence>
 
-      {/* MAIN CARD */}
-      <motion.div
-        className="main-card"
-        initial={{ y: 30, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
-      >
-        {/* NAV */}
-        <div className="nav-pill">
+      {/* compact header once the hero is out of view */}
+      <header className={`topbar ${scrolled ? "show" : ""}`}>
+        <span className="topbar-sub">(a cozy-corner portfolio)</span>
+        <a href="#top" className="display topbar-logo">shinnie.</a>
+        <button className="topbar-hi" onClick={() => openById("contact")}>say hi →</button>
+      </header>
+
+      <main id="top">
+        {/* ---------- hero ---------- */}
+        <section className="hero">
+          <Cloud className="c1" width={170} drift={30} duration={11} />
+          <Cloud className="c2" width={120} drift={-22} duration={8} />
+          <Cloud className="c3" width={140} drift={26} duration={10} />
+          <div className="hero-title">
+            <span className="hero-sub">(a cozy-corner portfolio)</span>
+            <motion.h1
+              className="display"
+              initial={{ opacity: 0, scale: 0.92 }}
+              animate={introDone || reduceMotion ? { opacity: 1, scale: 1 } : {}}
+              transition={{ duration: 0.8, delay: 0.3 }}
+            >
+              shinnie.
+            </motion.h1>
+          </div>
+          <span className="scroll-cue">scroll ↓</span>
+        </section>
+
+        {/* ---------- taglines ---------- */}
+        <section className="taglines">
+          <motion.p {...reveal}>Part coder, part crafter, part pickleball player</motion.p>
+          <motion.p {...reveal} transition={{ ...reveal.transition, delay: 0.25 }}>
+            Pull up a chair, stay a while
+          </motion.p>
+        </section>
+
+        {/* ---------- the desk ---------- */}
+        <section className="desk" aria-labelledby="desk-hint">
+          <p id="desk-hint" className="hint">
+            <span className="dot" /> Everything on the desk has a story. Click around.
+          </p>
+          <DeskScene items={ITEMS} onOpen={openById} onHover={setHovered} />
+          <p className="hover-label" aria-live="polite">
+            {hovered ? `→ ${hovered}` : " "}
+          </p>
+        </section>
+      </main>
+
+      {/* ---------- footer ---------- */}
+      <footer className="footer">
+        <Zigzag className="footer-edge" />
+        <div className="footer-row">
+          <span>MADE WITH ☕ &amp; 🧶</span>
+          <span>shinnie. {new Date().getFullYear()}</span>
+        </div>
+        <p className="display footer-big">thanks for stopping by :)</p>
+        <p className="footer-line">
+          is there anything better than a warm latte
+          <br />
+          and a half-finished crochet project?
+        </p>
+      </footer>
+
+      {/* ---------- floating dock ---------- */}
+      {menuOpen && <div className="menu-backdrop" onClick={() => setMenuOpen(false)} />}
+      <div className={`dock ${scrolled ? "show" : ""}`}>
+        <AnimatePresence>
+          {menuOpen && <MenuTag items={ITEMS} onPick={openById} />}
+        </AnimatePresence>
+        <div className="dock-pill">
           <button
-            className={activeTab === "about" ? "active" : ""}
-            onClick={() => setActiveTab("about")}
+            onClick={() => setMenuOpen((m) => !m)}
+            aria-label="Open menu"
+            aria-expanded={menuOpen}
           >
-            About
+            <Tag size={17} />
           </button>
-          <button
-            className={activeTab === "projects" ? "active" : ""}
-            onClick={() => setActiveTab("projects")}
-          >
-            Projects
+          <button onClick={() => step(-1)} aria-label="Previous section">
+            <ChevronLeft size={18} />
           </button>
-          <button
-            className={activeTab === "contact" ? "active" : ""}
-            onClick={() => setActiveTab("contact")}
-          >
-            Contact
+          <button onClick={() => step(1)} aria-label="Next section">
+            <ChevronRight size={18} />
           </button>
         </div>
+      </div>
 
-        {/* CONTENT */}
-        <div className="card-content">
-          {activeTab === "about" && (
-            <motion.div
-              className="hero"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              <h1>About Me</h1>
-              <div style={{ textAlign: "left" }}>
-                <p>Hi, I'm Shinnie, a Diploma in Computer Science student at TARUMT.</p>
-                <p>Seeking an opportunity to gain practical experience.</p>
-              </div>
-            </motion.div>
-          )}
-
-          {activeTab === "projects" && (
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              <h2>Projects</h2>
-              <div className="projects-grid">
-                <div className="project-item">
-                  <h3>Portfolio Website ✨</h3>
-                  <p>
-                    A digital scrapbook built with React & Framer Motion.
-                  </p>
-                </div>
-              </div>
-            </motion.div>
-          )}
-
-          {activeTab === "contact" && (
-            <motion.div
-              style={{ textAlign: "center" }}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-            >
-              <h2>Let's build something</h2>
-              <div style={{ display: "flex", justifyContent: "center", gap: "20px" }}>
-                <FaGithub size={28} />
-                <FaTwitter size={28} />
-                <FaLinkedin size={28} />
-                <FaEnvelope size={28} />
-              </div>
-            </motion.div>
-          )}
-        </div>
-      </motion.div>
-    </div>
+      <AnimatePresence>
+        {openIndex !== null && (
+          <ItemPanel
+            item={ITEMS[openIndex]}
+            index={openIndex}
+            total={ITEMS.length}
+            onClose={close}
+            onStep={step}
+          />
+        )}
+      </AnimatePresence>
+    </>
   );
 }

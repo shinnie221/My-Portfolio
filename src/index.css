@@ -1,10 +1,13 @@
-/* Cleaned out to let App.css handle styles for the digital scrapbook */
-
 * {
   box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   margin: 0;
   padding: 0;
+  overflow-x: hidden;
 }
